@@ -57,7 +57,7 @@ public class UserController {
     return ResponseEntity.ok(CollectionModel.of(employeeDto));
   }
 
-  @PostMapping("/add-employee")
+  @PostMapping("/addEmployee")
   public ResponseEntity<?> addEmployee(@RequestBody UserDTO usersDto) throws NotFoundException {
     try {
       var o = userService.createEmployee(usersDto);

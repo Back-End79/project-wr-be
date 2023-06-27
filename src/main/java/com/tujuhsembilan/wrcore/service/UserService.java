@@ -118,6 +118,8 @@ public class UserService {
         .lastContractStatus(usersDto.getLastContractStatus())
         .numberOfDependents(usersDto.getNumberOfDependents())
         .carrerStartDate(usersDto.getCarrerStartDate())
+        .department(usersDto.getDepartment())
+        .no(usersDto.getNo())
         // .contractEndDate(usersDto.getContractEndDate())
         .lastContractDate(usersDto.getLastContractDate())
         .joinDate(usersDto.getJoinDate())
