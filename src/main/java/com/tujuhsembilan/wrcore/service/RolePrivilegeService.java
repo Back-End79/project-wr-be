@@ -1,5 +1,7 @@
 package com.tujuhsembilan.wrcore.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,10 @@ public class RolePrivilegeService {
 
   public Page<RolePrivilege> getAllRolePrivilege(Pageable pageable) {
     return rolePrivilegeRepository.findAll(pageable);
+  }
+
+  public List<RolePrivilege> getRolePrivilegeById(Long rolePrivilege){
+    return rolePrivilegeRepository.findByRolePrivilegeId(rolePrivilege);
   }
 
   // public RolePrivilege addRolePrivilege(RolePrivilegeDTO rolePrivilegeDto) {

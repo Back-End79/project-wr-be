@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toedter.spring.hateoas.jsonapi.JsonApiModelBuilder;
 import com.tujuhsembilan.wrcore.model.Users;
+import com.tujuhsembilan.wrcore.dto.EmployeeDTO;
 import com.tujuhsembilan.wrcore.dto.UserDTO;
 import com.tujuhsembilan.wrcore.service.UserService;
 
@@ -36,28 +37,31 @@ public class UserController {
   private final UserService userService;
   private final MessageUtil msg;
 
+
   @GetMapping
-  public ResponseEntity<?> getAllEmployee(Pageable pageable) {
-    int pageSize = 10;
-    int pageNumber = pageable.getPageNumber();
+  public ResponseEntity<?> getAllEmployee(
+      @RequestParam(value = "employeeName", required = false) String employeeName,
+      Pageable pageable
+  ) {
+      int pageSize = 10;
+      int pageNumber = pageable.getPageNumber();
+      Pageable updatedPageable = PageRequest.of(pageNumber, pageSize, pageable.getSort());
 
-    Pageable updatedPageable = PageRequest.of(pageNumber, pageSize, pageable.getSort());
-    Page<Users> employeePage = userService.getAllUser(updatedPageable);
-    Page<UserDTO> employeeDto = employeePage.map(this::convertToDto);
-    // return ResponseEntity.ok(CollectionModel.of(employeeDto));
-    return ResponseEntity.ok(employeeDto);
+      if (employeeName != null && !employeeName.isEmpty()) {
+          List<Users> employees = userService.getUsersByName(employeeName);
+          List<EmployeeDTO> employeeDto = employees.stream()
+              .map(this::buildEmployeDTO)
+              .collect(Collectors.toList());
+          return ResponseEntity.ok(CollectionModel.of(employeeDto));
+      } else {
+          Page<Users> employeePage = userService.getAllUser(updatedPageable);
+          Page<EmployeeDTO> employeeDto = employeePage.map(this::buildEmployeDTO);
+          // return ResponseEntity.ok(CollectionModel.of(employeeDto));
+          return ResponseEntity.ok(employeeDto);
+      }
   }
 
-  @GetMapping("/search")
-  public ResponseEntity<?> searchEmployeesByName(@RequestParam("employeeName") String employeeName) {
-    List<Users> employees = userService.getUsersByName(employeeName);
-    List<UserDTO> employeeDto = employees.stream()
-        .map(this::convertToDto)
-        .collect(Collectors.toList());
-    return ResponseEntity.ok(CollectionModel.of(employeeDto));
-  }
-
-  @PostMapping("/add-employee")
+  @PostMapping("/addEmployee")
   public ResponseEntity<?> addEmployee(@RequestBody UserDTO usersDto) throws NotFoundException {
     try {
       var o = userService.createEmployee(usersDto);
@@ -149,16 +153,13 @@ public class UserController {
         .build();
   }
 
-  private UserDTO convertToDto(Users users) {
-    UserDTO usersDTO = new UserDTO();
-    usersDTO.setUserName(users.getUserName());
-    usersDTO.setNip(users.getNip());
-    usersDTO.setLastContractStatus(users.getLastContractStatus());
-    // usersDTO.setContractEndDate(usersDTO.getContractEndDate());
-    usersDTO.setPhotoProfile(users.getPhotoProfile());
-    // usersDTO.setStatusOnsite(categoryCodeRepository.findById(users.getStatusOnsite()).orElseThrow(()
-    // -> new NotFoundException()));
-    return usersDTO;
+  private EmployeeDTO buildEmployeDTO(Users users) {
+    return EmployeeDTO.builder()
+          .nip(users.getNip())
+          .fullName(users.getFirstName() + " " + users.getLastName())
+          .photoProfile(users.getPhotoProfile())
+          .lastContractStatus(users.getLastContractStatus())
+          .lastContractDate(users.getLastContractDate())
+          .build();
   }
-
 }

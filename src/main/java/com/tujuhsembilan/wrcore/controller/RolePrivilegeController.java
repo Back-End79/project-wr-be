@@ -1,22 +1,17 @@
 package com.tujuhsembilan.wrcore.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.toedter.spring.hateoas.jsonapi.JsonApiModelBuilder;
 import com.tujuhsembilan.wrcore.dto.RolePrivilegeDTO;
@@ -33,6 +28,36 @@ public class RolePrivilegeController {
   private final RolePrivilegeService rolePrivilegeService;
   private final MessageUtil msg;
 
+  @GetMapping
+  public ResponseEntity<?> getAll(@RequestParam(value = "rolePrivilege", required = false) Long rolePrivilegeId, Pageable pageable) {
+        
+      int pageSize = 10;
+      int pageNumber = pageable.getPageNumber();
+      Pageable updatedPageable = PageRequest.of(pageNumber, pageSize, pageable.getSort());
+
+      if (rolePrivilegeId != null) {
+          List<RolePrivilege> rolePrivilege = rolePrivilegeService.getRolePrivilegeById(rolePrivilegeId);
+          List<RolePrivilegeDTO> rolePrivilegeDTO = rolePrivilege.stream()
+              .map(this::buildRolePrivilegeDTO)
+              .collect(Collectors.toList());
+          return ResponseEntity.ok(CollectionModel.of(rolePrivilegeDTO));
+      } else {
+          Page<RolePrivilege> rolePrivilePage = rolePrivilegeService.getAllRolePrivilege(updatedPageable);
+          Page<RolePrivilegeDTO> rolePrivilegeDTO = rolePrivilePage.map(this::buildRolePrivilegeDTO);
+        //   return ResponseEntity.ok(CollectionModel.of(rolePrivilegeDTO));
+          return ResponseEntity.ok(rolePrivilegeDTO);
+      }
+
+  }
+
+  private RolePrivilegeDTO buildRolePrivilegeDTO(RolePrivilege rolePrivilege) {
+    return RolePrivilegeDTO.builder()
+            .rolePrivilegeId(rolePrivilege.getRolePrivilegeId())
+            .privilegeId(rolePrivilege.getPrivilegeId().getCategoryCodeId())
+            .roleId(rolePrivilege.getRoleId().getCategoryCodeId())
+            .build();
+  }
+
   @DeleteMapping("/{rolePrivilegeId}")
   public ResponseEntity<?> deleteRolePrivilege(@PathVariable Long rolePrivilegeId) throws NotFoundException {
     rolePrivilegeService.deleteRolePrivilege(rolePrivilegeId);
@@ -40,17 +65,6 @@ public class RolePrivilegeController {
         .body(JsonApiModelBuilder.jsonApiModel()
             .meta("message", msg.get("application.success.deleted", "Role Privilege")).build());
   }
-
-  // @GetMapping
-  //   public ResponseEntity<?> getAllRole(Pageable pageable) {
-  //       int pageSize = 10;
-  //       int pageNumber = pageable.getPageNumber();
-
-  //       Pageable updatePageable = PageRequest.of(pageNumber, pageSize, pageable.getSort());
-  //       Page<RolePrivilege> rolePrivilegePage = rolePrivilegeService.getAllRolePrivilege(updatePageable);
-  //       Page<RolePrivilegeDTO> rolePrivilegeDtoPage = rolePrivilegePage.map(this::convertToDto);
-  //       return ResponseEntity.ok(CollectionModel.of(rolePrivilegeDtoPage));
-  //   }
 
   //   @PostMapping("/add")
   //   public ResponseEntity<?> addRolePrivilege(@RequestBody RolePrivilegeDTO rolePrivilegeDto) {
