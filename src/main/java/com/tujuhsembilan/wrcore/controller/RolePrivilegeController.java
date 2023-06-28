@@ -28,7 +28,9 @@ import lombok.RequiredArgsConstructor;
 public class RolePrivilegeController {
   private final RolePrivilegeService rolePrivilegeService;
   private final MessageUtil msg;
-
+/*
+ * role prtivilege blym bisa serch binugn pengimplementasi code nya & blm bisa menampilkan data yang ber relasi ke categor
+ */
   @GetMapping
   public ResponseEntity<?> getAll(@RequestParam(value = "roleId", required = false) Long roleId, Pageable pageable) {
         
