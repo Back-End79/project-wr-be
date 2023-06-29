@@ -21,13 +21,13 @@ import lib.i18n.utility.MessageUtil;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/userRole")
+@RequestMapping("/user-role")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserRoleController {
   private final UserRoleService userRoleService;
   private final MessageUtil messageUtil;
 
-  @PostMapping("/addUserRole")
+  @PostMapping("/add-user-role")
   public ResponseEntity<?> addUserRole(@RequestBody UserRoleDTO userRoleDto) throws NotFoundException {
     try {
       var o = userRoleService.addUserRole(userRoleDto);
