@@ -56,7 +56,7 @@ public class UserService {
     CategoryCode statusOnsite = getCategoryCodeById(userDto.getStatusOnsite());
     CategoryCode ptkpStatus = getCategoryCodeById(userDto.getPtkpStatus());
 
-    Users updatedUser = UpdatedUserMapper(existingUser, userDto, jobType, placementType, group, position, statusOnsite,
+    Users updatedUser = updatedUserMapper(existingUser, userDto, jobType, placementType, group, position, statusOnsite,
         ptkpStatus);
 
     Users savedUser = userRepository.save(updatedUser);
@@ -75,7 +75,7 @@ public class UserService {
     return userRepository.findByUserNameContainingIgnoreCase(userName);
   }
 
-  private CategoryCode getCategoryCodeById(Long categoryId) throws NotFoundException {
+  private CategoryCode getCategoryCodeById(Long categoryId) {
     return categoryCodeRepository.findByCategoryCodeId(categoryId)
         .orElseGet(() -> new CategoryCode());
   }
@@ -132,7 +132,7 @@ public class UserService {
         .build();
   }
 
-  private Users UpdatedUserMapper(Users existingUser, UserDTO userDto, CategoryCode jobType,
+  private Users updatedUserMapper(Users existingUser, UserDTO userDto, CategoryCode jobType,
       CategoryCode placementType, CategoryCode group, CategoryCode position,
       CategoryCode statusOnsite, CategoryCode ptkpStatus) {
     return Users.builder()
