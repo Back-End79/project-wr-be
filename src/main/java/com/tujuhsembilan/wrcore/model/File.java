@@ -18,11 +18,11 @@ public class File {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "working_report_id", referencedColumnName = "working_report_id")
-    private Long workingReportId;
+    private WorkingReport workingReportId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", referencedColumnName = "task_id")
-    private Long taskId;
+    private Task taskId;
 
     @Column(name = "file_name")
     private String fileName;

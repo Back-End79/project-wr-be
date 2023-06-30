@@ -18,15 +18,15 @@ public class Task{
 
     @OneToOne
     @JoinColumn(name = "backlog_id", referencedColumnName = "backlog_id")
-    private Long backlogId;
+    private Backlog backlogId;
 
     @OneToOne
     @JoinColumn(name = "working_report_id", referencedColumnName = "working_report_id")
-    private Long workingReportId;
+    private WorkingReport workingReportId;
 
     @OneToOne
     @JoinColumn(name = "category_code_id", referencedColumnName = "category_code_id")
-    private Long categoryCodeId;
+    private CategoryCode categoryCodeId;
 
     @Column(name = "task_item")
     private String taskItem;

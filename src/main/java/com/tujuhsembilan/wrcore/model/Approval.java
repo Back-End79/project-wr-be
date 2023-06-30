@@ -1,14 +1,6 @@
 package com.tujuhsembilan.wrcore.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.*;
 
@@ -24,13 +16,13 @@ public class Approval {
     @Column(name = "approval_id", unique = true, nullable = false)
     private Long ApprovalId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id", referencedColumnName = "period_id")
-    private Long periodId;
+    private Period periodId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private Long userId;
+    private Users userId;
 
     @Column(name = "label_approval")
     private String labelApproval;

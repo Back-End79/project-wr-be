@@ -19,15 +19,15 @@ public class WorkingReport {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id", referencedColumnName = "period_id")
-    private Long periodId;
+    private Period periodId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "presence_id", referencedColumnName = "category_code_id")
-    private Long presenceId;
+    private CategoryCode presenceId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private Long userId;
+    private Users userId;
 
     @Column(name = "date")
     private Date date;

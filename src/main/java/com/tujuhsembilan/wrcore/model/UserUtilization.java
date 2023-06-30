@@ -20,15 +20,15 @@ public class UserUtilization {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private Long userId;
+    private Users userId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", referencedColumnName = "company_id")
-    private long companyId;
+    private Company companyId;
     
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
-    private Long projectId;
+    private Project projectId;
 
     @Column(name = "start_date")
     private Date startDate;
