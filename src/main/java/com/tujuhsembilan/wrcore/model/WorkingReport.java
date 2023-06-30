@@ -11,21 +11,22 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "working_report", schema = "public")
+@Entity
 public class WorkingReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "working_report_id", unique = true, nullable = false)
     private Long WorkingReportId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id", referencedColumnName = "period_id")
     private Period periodId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "presence_id", referencedColumnName = "category_code_id")
     private CategoryCode presenceId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private Users userId;
 
