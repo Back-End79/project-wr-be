@@ -14,7 +14,7 @@ public class Approval {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "approval_id", unique = true, nullable = false)
-    private Long ApprovalId;
+    private Long approvalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id", referencedColumnName = "period_id")

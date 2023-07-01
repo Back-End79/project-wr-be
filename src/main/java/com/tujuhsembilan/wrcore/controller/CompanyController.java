@@ -40,7 +40,7 @@ public class CompanyController {
   private final ModelMapper modelMapper;
   private final MessageUtil msg;
 
-  @PostMapping("/add-company")
+  @PostMapping("/addCompany")
   public ResponseEntity<?> addCompany(@RequestBody CompanyDTO companyDto) {
     var o = companyService.addCompany(companyDto);
     return ResponseEntity.status(HttpStatus.CREATED)

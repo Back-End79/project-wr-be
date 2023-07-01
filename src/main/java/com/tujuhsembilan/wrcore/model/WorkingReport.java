@@ -16,7 +16,7 @@ public class WorkingReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "working_report_id", unique = true, nullable = false)
-    private Long WorkingReportId;
+    private Long workingReportId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id", referencedColumnName = "period_id")
