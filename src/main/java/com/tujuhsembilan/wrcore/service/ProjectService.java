@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tujuhsembilan.wrcore.dto.ProjectDTO;
+import com.tujuhsembilan.wrcore.ol.dto.OLProjectDTO;
 import com.tujuhsembilan.wrcore.model.Company;
 import com.tujuhsembilan.wrcore.model.Project;
 import com.tujuhsembilan.wrcore.repository.CompanyRepository;
@@ -51,6 +52,10 @@ public class ProjectService {
       return true;
     }
     return false;
+  }
+
+  public List<OLProjectDTO> findAllByProjectNameAndSearch(String search) {
+    return projectRepository.findAllByProjectNameAndSearch(search.toLowerCase());
   }
 
   private Project convertToEntity(ProjectDTO projectDTO) {
