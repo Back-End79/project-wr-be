@@ -2,10 +2,11 @@ package com.tujuhsembilan.wrcore.service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.tujuhsembilan.wrcore.dto.BacklogDTO;
@@ -29,6 +30,14 @@ public class BacklogService {
   private final UserRepository userRepository;
   private final ProjectRepository projectRepository;
 
+  public Page<Backlog> getAllBacklogs(Pageable pageable) {
+    return backlogRepository.findAll(pageable);
+  }
+
+  public Page<Backlog> getAllBacklogsWithSearch(Pageable pageable, String search) {
+    return backlogRepository.findByTaskNameContainingIgnoreCase(search, pageable);
+  }
+
   public Backlog createBacklog(BacklogDTO backlogDTO) {
     Project projectId = getProjectId(backlogDTO.getProjectId());
     CategoryCode statusBacklog = getCategoryCodeById(backlogDTO.getStatusBacklog());
@@ -42,10 +51,6 @@ public class BacklogService {
   public Backlog getBacklogById(Long backlogId) throws NotFoundException {
     return backlogRepository.findById(backlogId)
         .orElseThrow(() -> new NotFoundException());
-  }
-
-  public List<Backlog> getAllBacklogs() {
-    return backlogRepository.findAll();
   }
 
   public Backlog updateBacklog(Long backlogId, BacklogDTO backlogDTO) throws NotFoundException {

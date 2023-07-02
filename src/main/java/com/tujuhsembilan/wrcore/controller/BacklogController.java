@@ -5,8 +5,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toedter.spring.hateoas.jsonapi.JsonApiModelBuilder;
@@ -34,14 +38,22 @@ public class BacklogController {
   private final MessageUtil messageUtil;
 
   @GetMapping
-  public ResponseEntity<?> getAllBacklogs() {
-    List<Backlog> backlogs = backlogService.getAllBacklogs();
+  public ResponseEntity<?> getAllBacklogs(Pageable pageable, @RequestParam(required = false) String search) {
+    Page<Backlog> backlogPage;
 
-    List<BacklogDTO> backlogDTOs = backlogs.stream()
+    if (search != null) {
+      backlogPage = backlogService.getAllBacklogsWithSearch(pageable, search);
+    } else {
+      backlogPage = backlogService.getAllBacklogs(pageable);
+    }
+
+    List<BacklogDTO> backlogDTOs = backlogPage.getContent().stream()
         .map(this::convertToDto)
         .collect(Collectors.toList());
 
-    return ResponseEntity.ok(CollectionModel.of(backlogDTOs));
+    return ResponseEntity.ok(PagedModel.of(backlogDTOs,
+        new PageMetadata(backlogPage.getSize(), backlogPage.getNumber(),
+            backlogPage.getTotalElements())));
   }
 
   @PostMapping
@@ -89,11 +101,15 @@ public class BacklogController {
   }
 
   private BacklogDTO convertToDto(Backlog backlog) {
+    String fullName = backlog.getUserId().getFirstName() + " " + backlog.getUserId().getLastName();
     return BacklogDTO.builder()
         .backlogId(backlog.getBacklogId())
         .projectId(backlog.getProjectId().getProjectId())
         .statusBacklog(backlog.getStatusBacklog().getCategoryCodeId())
         .userId(backlog.getUserId().getUserId())
+        .projectName(backlog.getProjectId().getPicProjectName())
+        .status(backlog.getStatusBacklog().getCodeName())
+        .userName(fullName)
         .taskName(backlog.getTaskName())
         .taskDescription(backlog.getTaskDescription())
         .estimationTime(backlog.getEstimationTime())
