@@ -19,4 +19,7 @@ public class RolePrivilegeDTO {
   private Long rolePrivilegeId;
   private Long roleId;
   private Long privilegeId;
+  private String privilegeCategoryName; 
+  private String roleCategoryName; 
+    
 }

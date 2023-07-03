@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.toedter.spring.hateoas.jsonapi.JsonApiModelBuilder;
 import com.tujuhsembilan.wrcore.dto.RolePrivilegeDTO;
+import com.tujuhsembilan.wrcore.model.CategoryCode;
 import com.tujuhsembilan.wrcore.model.RolePrivilege;
+import com.tujuhsembilan.wrcore.repository.CategoryCodeRepository;
 import com.tujuhsembilan.wrcore.service.RolePrivilegeService;
 
 import lib.i18n.utility.MessageUtil;
@@ -28,12 +30,13 @@ import lombok.RequiredArgsConstructor;
 public class RolePrivilegeController {
   private final RolePrivilegeService rolePrivilegeService;
   private final MessageUtil msg;
+  private final CategoryCodeRepository categoryCodeRepository;
 /*
- * role prtivilege blym bisa serch binugn pengimplementasi code nya & blm bisa menampilkan data yang ber relasi ke categor
+ * role prtivilege blym bisa serch 
  */
   @GetMapping
   public ResponseEntity<?> getAll(@RequestParam(value = "roleId", required = false) Long roleId, Pageable pageable) {
-        
+
       int pageSize = 10;
       int pageNumber = pageable.getPageNumber();
       Pageable updatedPageable = PageRequest.of(pageNumber, pageSize, pageable.getSort());
@@ -41,24 +44,48 @@ public class RolePrivilegeController {
       if (roleId != null) {
           List<RolePrivilege> rolePrivilege = rolePrivilegeService.getRoleById(roleId);
           List<RolePrivilegeDTO> rolePrivilegeDTO = rolePrivilege.stream()
-              .map(this::buildRolePrivilegeDTO)
-              .collect(Collectors.toList());
+                  .map(this::buildRolePrivilegeDTO)
+                  .collect(Collectors.toList());
           return ResponseEntity.ok(CollectionModel.of(rolePrivilegeDTO));
       } else {
           Page<RolePrivilege> rolePrivilePage = rolePrivilegeService.getAllRolePrivilege(updatedPageable);
           Page<RolePrivilegeDTO> rolePrivilegeDTO = rolePrivilePage.map(this::buildRolePrivilegeDTO);
-        //   return ResponseEntity.ok(CollectionModel.of(rolePrivilegeDTO));
+          //   return ResponseEntity.ok(CollectionModel.of(rolePrivilegeDTO));
           return ResponseEntity.ok(rolePrivilegeDTO);
       }
   }
 
   private RolePrivilegeDTO buildRolePrivilegeDTO(RolePrivilege rolePrivilege) {
-    return RolePrivilegeDTO.builder()
+    RolePrivilegeDTO rolePrivilegeDTO = RolePrivilegeDTO.builder()
             .rolePrivilegeId(rolePrivilege.getRolePrivilegeId())
             .privilegeId(rolePrivilege.getPrivilegeId().getCategoryCodeId())
             .roleId(rolePrivilege.getRoleId().getCategoryCodeId())
             .build();
-  }
+
+    // Mengambil informasi kategori berdasarkan ID privilege dan role
+    CategoryCode privilegeCategory = categoryCodeRepository.findById(rolePrivilege.getPrivilegeId().getCategoryCodeId()).orElse(null);
+    CategoryCode roleCategory = categoryCodeRepository.findById(rolePrivilege.getRoleId().getCategoryCodeId()).orElse(null);
+
+    // Mengisi informasi kategori ke dalam DTO
+    if (privilegeCategory != null) {
+        rolePrivilegeDTO.setPrivilegeCategoryName(privilegeCategory.getCategoryName());
+    }
+
+    if (roleCategory != null) {
+        rolePrivilegeDTO.setRoleCategoryName(roleCategory.getCategoryName());
+    }
+
+    return rolePrivilegeDTO;
+}
+
+
+//   private RolePrivilegeDTO buildRolePrivilegeDTO(RolePrivilege rolePrivilege) {
+//     return RolePrivilegeDTO.builder()
+//             .rolePrivilegeId(rolePrivilege.getRolePrivilegeId())
+//             .privilegeId(rolePrivilege.getPrivilegeId().getCategoryCodeId())
+//             .roleId(rolePrivilege.getRoleId().getCategoryCodeId())
+//             .build();
+//   }
 
   @DeleteMapping("/{rolePrivilegeId}")
   public ResponseEntity<?> deleteRolePrivilege(@PathVariable Long rolePrivilegeId) throws NotFoundException {
