@@ -38,4 +38,5 @@ public class BacklogDTO {
   private Timestamp createdOn;
   private Timestamp updatedOn;
   private String priority;
+  private String taskCode;
 }

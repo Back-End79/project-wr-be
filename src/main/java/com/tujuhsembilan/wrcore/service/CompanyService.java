@@ -30,12 +30,8 @@ public class CompanyService {
     Company company = Company.builder()
         .companyName(companyDto.getCompanyName())
         .companyEmail(companyDto.getCompanyEmail())
-        .picName(companyDto.getPicName())
-        .picEmail(companyDto.getPicEmail())
-        .picPhone(companyDto.getPicPhone())
         .address(companyDto.getAddress())
         .npwp(companyDto.getNpwp())
-        .email(companyDto.getEmail())
         .companyProfile(companyDto.getCompanyProfile())
         .build();
     companyRepository.save(company);

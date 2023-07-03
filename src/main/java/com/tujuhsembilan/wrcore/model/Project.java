@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Data
 @Builder
@@ -40,6 +41,25 @@ public class Project {
   @Column(name = "end_date")
   private Date endDate;
 
-  @Column(name = "project_type", length = 25)
-  private String projectType;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "`project_type`")
+  private CategoryCode projectType;
+
+  @Column(name = "is_active")
+  private boolean isActive;
+
+  @Column(name = "created_by")
+  private Long createdBy;
+
+  @Column(name = "created_on")
+  private Timestamp createdOn;
+
+  @Column(name = "last_modified_on")
+  private Timestamp lastModifiedOn;
+
+  @Column(name = "last_modified_by")
+  private Long lastModifiedBy;
+
+  @Column(name = "initial_project", length = 20)
+  private String initialProject;
 }

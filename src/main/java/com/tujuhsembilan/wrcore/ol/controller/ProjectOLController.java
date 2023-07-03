@@ -19,7 +19,7 @@ public class ProjectOLController {
   private final ProjectService service;
 
   @GetMapping
-  public ResponseEntity<?> olProject(@RequestParam String search) {
+  public ResponseEntity<?> olProject(@RequestParam(required = false) String search) {
     return ResponseEntity.ok(
         CollectionModel.of(service.findAllByProjectNameAndSearch(search)));
   }

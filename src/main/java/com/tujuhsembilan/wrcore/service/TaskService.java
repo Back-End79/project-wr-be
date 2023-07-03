@@ -17,23 +17,22 @@ import lombok.*;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskService {
-    
-    private final TaskRepository taskRepository;
-    private final ModelMapper modelMapper;
-    private final BacklogRepository backlogRepository;
-    private final WorkingRepository workingRepository;
-    private final CategoryCodeRepository categoryCodeRepository;
 
-    public Task createTask(TaskDTO taskDTO) throws NotFoundException{
-        Task task = Task.builder()
-                .backlogId(backlogRepository.findById(taskDTO.getBacklogId()).orElseThrow(() -> new NotFoundException()))
-                .workingReportId(workingRepository.findById(taskDTO.getWorkingReportId()).orElseThrow(() -> new NotFoundException()))
-                .categoryCodeId(categoryCodeRepository.findById(taskDTO.getCategoryCodeId()).orElseThrow(() -> new NotFoundException()))
-                .taskItem(taskDTO.getTaskItem())
-                .duration(taskDTO.getDuration())
-                .isOvertime(false)
-                .filePath(taskDTO.getFilePath())
-                .build();
-       return taskRepository.save(task);
-    }
+  private final TaskRepository taskRepository;
+  private final ModelMapper modelMapper;
+  private final BacklogRepository backlogRepository;
+  private final WorkingRepository workingRepository;
+  private final CategoryCodeRepository categoryCodeRepository;
+
+  public Task createTask(TaskDTO taskDTO) throws NotFoundException {
+    Task task = Task.builder()
+        .backlogId(backlogRepository.findById(taskDTO.getBacklogId()).orElseThrow(() -> new NotFoundException()))
+        .workingReportId(
+            workingRepository.findById(taskDTO.getWorkingReportId()).orElseThrow(() -> new NotFoundException()))
+        .taskItem(taskDTO.getTaskItem())
+        .duration(taskDTO.getDuration())
+        .isOvertime(false)
+        .build();
+    return taskRepository.save(task);
+  }
 }

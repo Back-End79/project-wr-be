@@ -38,7 +38,8 @@ public class BacklogController {
   private final MessageUtil messageUtil;
 
   @GetMapping
-  public ResponseEntity<?> getAllBacklogs(Pageable pageable, @RequestParam(required = false) String search) {
+  public ResponseEntity<?> getAllBacklogs(Pageable pageable, @RequestParam(required = false) String search,
+      @RequestParam(required = false) String sort) {
     Page<Backlog> backlogPage;
 
     if (search != null) {
