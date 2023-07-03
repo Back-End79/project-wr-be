@@ -1,5 +1,8 @@
 package com.tujuhsembilan.wrcore.model;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 
 import lombok.*;
@@ -10,33 +13,38 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "task")
-public class Task{ 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "task_id")
-    private Long taskId;
+public class Task {
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "task_id")
+  private Long taskId;
 
-    @OneToOne
-    @JoinColumn(name = "backlog_id", referencedColumnName = "backlog_id")
-    private Backlog backlogId;
+  @OneToOne
+  @JoinColumn(name = "backlog_id", referencedColumnName = "backlog_id")
+  private Backlog backlogId;
 
-    @OneToOne
-    @JoinColumn(name = "working_report_id", referencedColumnName = "working_report_id")
-    private WorkingReport workingReportId;
+  @OneToOne
+  @JoinColumn(name = "working_report_id", referencedColumnName = "working_report_id")
+  private WorkingReport workingReportId;
 
-    @OneToOne
-    @JoinColumn(name = "category_code_id", referencedColumnName = "category_code_id")
-    private CategoryCode categoryCodeId;
+  @Column(name = "task_item")
+  private String taskItem;
 
-    @Column(name = "task_item")
-    private String taskItem;
+  @Column(name = "duration")
+  private BigDecimal duration;
 
-    @Column(name = "duration")
-    private int duration;
+  @Column(name = "is_overtime")
+  private boolean isOvertime;
 
-    @Column(name = "is_overtime")
-    private boolean isOvertime;
+  @Column(name = "created_on")
+  private Timestamp createdOn;
 
-    @Column(name = "file_path")
-    private String filePath;
+  @Column(name = "created_by")
+  private Long createdBy;
+
+  @Column(name = "updated_on")
+  private Timestamp updatedOn;
+
+  @Column(name = "updated_by")
+  private Long updatedBy;
 }

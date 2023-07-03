@@ -69,4 +69,7 @@ public class Backlog {
   @Column(name = "priority", length = 10)
   private String priority;
 
+  @Column(name = "task_code", length = 50)
+  private String taskCode;
+
 }

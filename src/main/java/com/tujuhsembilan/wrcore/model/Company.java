@@ -1,5 +1,7 @@
 package com.tujuhsembilan.wrcore.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,25 +33,27 @@ public class Company {
   @Column(name = "company_email")
   private String companyEmail;
 
-  @Column(name = "pic_name")
-  private String picName;
-
-  @Column(name = "pic_email")
-  private String picEmail;
-
-  @Column(name = "pic_phone")
-  private String picPhone;
-
   @Column(name = "address")
   private String address;
 
   @Column(name = "npwp")
   private String npwp;
 
-  @Column(name = "email")
-  private String email;
-
   @Column(name = "company_profile", columnDefinition = "text")
   private String companyProfile;
 
+  @Column(name = "is_active")
+  private boolean isActive;
+
+  @Column(name = "created_by")
+  private Long createdBy;
+
+  @Column(name = "created_on")
+  private Timestamp createdOn;
+
+  @Column(name = "last_modified_on")
+  private Timestamp lastModifiedOn;
+
+  @Column(name = "last_modified_by")
+  private Long lastModifiedBy;
 }

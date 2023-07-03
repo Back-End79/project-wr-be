@@ -19,11 +19,7 @@ public class CompanyDTO {
   private Long companyId;
   private String companyName;
   private String companyEmail;
-  private String picName;
-  private String picEmail;
-  private String picPhone;
   private String address;
   private String npwp;
-  private String email;
   private String companyProfile;
 }
