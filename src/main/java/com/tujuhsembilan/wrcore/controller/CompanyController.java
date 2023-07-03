@@ -7,10 +7,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,27 +52,26 @@ public class CompanyController {
             .build());
   }
 
-  //
-  @GetMapping
-  public ResponseEntity<?> getAllCompany(Pageable pageable) {
-    int pageSize = 10;
-    int pageNumber = pageable.getPageNumber();
+ @GetMapping
+public ResponseEntity<?> getAllCompany(Pageable pageable, @RequestParam(required = false) String search) {
 
-    Pageable updatedPageable = PageRequest.of(pageNumber, pageSize, pageable.getSort());
-    Page<Company> companyPage = companyService.getAllCompany(updatedPageable);
-    Page<CompanyDTO> companyDtoPage = companyPage.map(this::convertToDto);
-    // return ResponseEntity.ok(CollectionModel.of(companyDtoPage));
-    return ResponseEntity.ok(companyDtoPage);
-  }
+    Page<Company> companyPage;
 
-  @GetMapping("/search")
-  public ResponseEntity<?> searchCompanyByName(@RequestParam("companyName") String company_name) {
-    List<Company> company = companyService.getCompanyByName(company_name);
-    List<CompanyDTO> companyDto = company.stream()
-        .map(this::convertToDto)
-        .collect(Collectors.toList());
-    return ResponseEntity.ok(CollectionModel.of(companyDto));
-  }
+    if (search != null && !search.isEmpty()) {
+        companyPage = companyService.getCompanyByName(pageable, search);
+    } else {
+        companyPage = companyService.getAllCompany(pageable);
+    }
+
+    List<CompanyDTO> companyDTO = companyPage.getContent().stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+
+    return ResponseEntity.ok(PagedModel.of(companyDTO,
+            new PageMetadata(companyPage.getSize(), companyPage.getNumber(),
+                    companyPage.getTotalElements())));
+}
+
 
   @GetMapping("/{companyId}")
   public ResponseEntity<?> getCompanyById(@PathVariable Long companyId) throws NotFoundException {

@@ -1,6 +1,5 @@
 package com.tujuhsembilan.wrcore.service;
 
-import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,17 +51,21 @@ public class CompanyService {
     Company existingCompany = getCompanyById(companyId);
 
     Company updatedCompany = convertToEntity(companyDTO);
-    updatedCompany.setCompanyId(existingCompany.getCompanyId()); // Preserve the existing Company ID
+    updatedCompany.setCompanyId(existingCompany.getCompanyId());
     Company savedCompany = companyRepository.save(updatedCompany);
 
     return savedCompany;
   }
 
   //
-
-  public List<Company> getCompanyByName(String company_name) {
-    return companyRepository.findByCompanyNameContainingIgnoreCase(company_name);
+  public Page<Company> getCompanyByName(Pageable pageable, String companyName) {
+      return companyRepository.findByCompanyNameContainingIgnoreCase(companyName, pageable);
   }
+
+
+  // public Page<Company> getCompanyByName(Pageable pageable,String company_name) {
+  //   return companyRepository.findByCompanyNameContainingIgnoreCase(company_name, pageable);
+  // }
 
   public void deleteCompany(Long id) {
     companyRepository.deleteById(id);
