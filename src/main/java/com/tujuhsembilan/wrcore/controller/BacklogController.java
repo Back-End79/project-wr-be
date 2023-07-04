@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.PagedModel.PageMetadata;
@@ -38,12 +39,15 @@ public class BacklogController {
   private final MessageUtil messageUtil;
 
   @GetMapping
-  public ResponseEntity<?> getAllBacklogs(Pageable pageable, @RequestParam(required = false) String search,
-      @RequestParam(required = false) String sort) {
+  public ResponseEntity<?> getAllBacklogs(
+      Pageable pageable,
+      @RequestParam(required = false, defaultValue = "taskName") String sortBy,
+      @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortDirection,
+      @RequestParam(required = false, defaultValue = "") String search) {
     Page<Backlog> backlogPage;
 
-    if (search != null) {
-      backlogPage = backlogService.getAllBacklogsWithSearch(pageable, search);
+    if (search != null || sortBy != null || sortDirection != null) {
+      backlogPage = backlogService.searchAndSortBacklogs(search, sortBy, sortDirection, pageable);
     } else {
       backlogPage = backlogService.getAllBacklogs(pageable);
     }
@@ -57,7 +61,7 @@ public class BacklogController {
             backlogPage.getTotalElements())));
   }
 
-  @PostMapping
+  @PostMapping("/addBacklog")
   public ResponseEntity<?> createBacklog(@RequestBody BacklogDTO backlogDTO) {
     Backlog createdBacklog = backlogService.createBacklog(backlogDTO);
     BacklogDTO createdBacklogDTO = convertToDto(createdBacklog);
@@ -71,38 +75,66 @@ public class BacklogController {
   }
 
   @GetMapping("/{backlogId}")
-  public ResponseEntity<?> getBacklogById(@PathVariable Long backlogId) throws NotFoundException {
-    Backlog backlog = backlogService.getBacklogById(backlogId);
+  public ResponseEntity<?> getBacklogById(@PathVariable Long backlogId) {
+    try {
+      Backlog backlog = backlogService.getBacklogById(backlogId);
+      BacklogDTO backlogDTO = convertToDto(backlog);
+      return ResponseEntity.ok(EntityModel.of(backlogDTO));
 
-    BacklogDTO backlogDTO = convertToDto(backlog);
-    return ResponseEntity.ok(EntityModel.of(backlogDTO));
+    } catch (NotFoundException ex) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(JsonApiModelBuilder
+              .jsonApiModel()
+              .meta("message", "Data Not Found!")
+              .build());
+
+    }
   }
 
   @PutMapping("/{backlogId}")
-  public ResponseEntity<?> updateBacklog(@PathVariable Long backlogId,
-      @RequestBody BacklogDTO backlogDTO)
-      throws NotFoundException {
-    Backlog updatedBacklog = backlogService.updateBacklog(backlogId, backlogDTO);
-    BacklogDTO updatedBacklogDTO = convertToDto(updatedBacklog);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(JsonApiModelBuilder
-            .jsonApiModel()
-            .model(EntityModel.of(updatedBacklogDTO))
-            .meta("message",
-                messageUtil.get("application.success.updated", "Backlog"))
-            .build());
+  public ResponseEntity<?> updateBacklog(@PathVariable Long backlogId, @RequestBody BacklogDTO backlogDTO) {
+    try {
+      Backlog updatedBacklog = backlogService.updateBacklog(backlogId, backlogDTO);
+      BacklogDTO updatedBacklogDTO = convertToDto(updatedBacklog);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(JsonApiModelBuilder
+              .jsonApiModel()
+              .model(EntityModel.of(updatedBacklogDTO))
+              .meta("message", messageUtil.get("application.success.updated", "Backlog"))
+              .build());
+
+    } catch (NotFoundException ex) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(JsonApiModelBuilder
+              .jsonApiModel()
+              .meta("message", "Data Not Found!")
+              .build());
+
+    }
   }
 
   @DeleteMapping("/{backlogId}")
-  public ResponseEntity<?> deleteBacklog(@PathVariable Long backlogId) throws NotFoundException {
-    backlogService.deleteBacklog(backlogId);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(JsonApiModelBuilder.jsonApiModel()
-            .meta("message", messageUtil.get("application.success.deleted", "Backlog")).build());
+  public ResponseEntity<?> deleteBacklog(@PathVariable Long backlogId) {
+    try {
+      backlogService.deleteBacklog(backlogId);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(JsonApiModelBuilder.jsonApiModel()
+              .meta("message", messageUtil.get("application.success.deleted", "Backlog"))
+              .build());
+
+    } catch (NotFoundException ex) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(JsonApiModelBuilder
+              .jsonApiModel()
+              .meta("message", "Data Not Found!")
+              .build());
+
+    }
   }
 
   private BacklogDTO convertToDto(Backlog backlog) {
     String fullName = backlog.getUserId().getFirstName() + " " + backlog.getUserId().getLastName();
+
     return BacklogDTO.builder()
         .backlogId(backlog.getBacklogId())
         .projectId(backlog.getProjectId().getProjectId())
@@ -110,7 +142,7 @@ public class BacklogController {
         .userId(backlog.getUserId().getUserId())
         .projectName(backlog.getProjectId().getPicProjectName())
         .status(backlog.getStatusBacklog().getCodeName())
-        .userName(fullName)
+        .assignedTo(fullName)
         .taskName(backlog.getTaskName())
         .taskDescription(backlog.getTaskDescription())
         .estimationTime(backlog.getEstimationTime())
@@ -122,6 +154,7 @@ public class BacklogController {
         .createdOn(backlog.getCreatedOn())
         .updatedOn(backlog.getUpdatedOn())
         .priority(backlog.getPriority())
+        .taskCode(backlog.getTaskCode())
         .build();
   }
 }

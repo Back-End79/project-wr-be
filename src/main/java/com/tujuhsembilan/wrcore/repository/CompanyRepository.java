@@ -11,8 +11,7 @@ import com.tujuhsembilan.wrcore.model.Company;
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
   Page<Company> findByCompanyNameContainingIgnoreCase(String companyName, Pageable pageable);
-  Page<Company> findAll(Pageable pageable);
-
+  // Page<Company> findAll(Pageable pageable);
 
   Optional<Company> findByCompanyId(Long companyId);
 }

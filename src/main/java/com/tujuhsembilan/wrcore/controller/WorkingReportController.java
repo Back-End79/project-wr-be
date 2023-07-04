@@ -22,46 +22,46 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/workingReport")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkingReportController {
-    
-    private final WorkingReportService workingReportService;
-    private final MessageUtil messageUtil;
 
-    @PostMapping("/addWorkingReport")
-    public ResponseEntity<?> addWorkingReport(@RequestBody WorkingReportDTO workingReportDTO) throws NotFoundException {
-        try {
-            var o = workingReportService.createWorkingReport(workingReportDTO);
-            var u = buildWorkingReportDTO(o);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(JsonApiModelBuilder
-                            .jsonApiModel()
-                            .model(EntityModel.of(u))
-                            .meta("message", messageUtil.get("application.success.created", "Working Report"))
-                            .build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(JsonApiModelBuilder
-                            .jsonApiModel()
-                            .meta("message", e.getMessage())
-                            .build());
-        }
-    }
+  private final WorkingReportService workingReportService;
+  private final MessageUtil messageUtil;
 
-    private WorkingReportDTO buildWorkingReportDTO(WorkingReport workingReport) {
-        return WorkingReportDTO.builder()
-                .workingReportId(workingReport.getWorkingReportId())
-                .periodId(workingReport.getPeriodId().getPeriodId())
-                .presenceId(workingReport.getPresenceId().getCategoryCodeId())
-                .userId(workingReport.getUserId().getUserId())
-                .date(workingReport.getDate())
-                .checkIn(workingReport.getCheckIn())
-                .checkOut(workingReport.getCheckOut())
-                .workLocation(workingReport.getWorkLocation())
-                .totalHours(workingReport.getTotalHours())
-                .createTime(workingReport.getCreateTime())
-                .lastModifiedTime(workingReport.getLastModifiedTime())
-                .isHoliday(workingReport.isHoliday())
-                .locationCheckin(workingReport.getLocationCheckin())
-                .locationCheckout(workingReport.getLocationCheckout())
-                .build();
+  @PostMapping("/addWorkingReport")
+  public ResponseEntity<?> addWorkingReport(@RequestBody WorkingReportDTO workingReportDTO) throws NotFoundException {
+    try {
+      var o = workingReportService.createWorkingReport(workingReportDTO);
+      var u = buildWorkingReportDTO(o);
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(JsonApiModelBuilder
+              .jsonApiModel()
+              .model(EntityModel.of(u))
+              .meta("message", messageUtil.get("application.success.created", "Working Report"))
+              .build());
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(JsonApiModelBuilder
+              .jsonApiModel()
+              .meta("message", e.getMessage())
+              .build());
     }
+  }
+
+  private WorkingReportDTO buildWorkingReportDTO(WorkingReport workingReport) {
+    return WorkingReportDTO.builder()
+        .workingReportId(workingReport.getWorkingReportId())
+        .periodId(workingReport.getPeriodId().getPeriodId())
+        .presenceId(workingReport.getPresenceId().getCategoryCodeId())
+        .userId(workingReport.getUserId().getUserId())
+        .date(workingReport.getDate())
+        // .checkIn(workingReport.getCheckIn())
+        // .checkOut(workingReport.getCheckOut())
+        .workLocation(workingReport.getWorkLocation())
+        // .totalHours(workingReport.getTotalHours())
+        // .createTime(workingReport.getCreateTime())
+        .lastModifiedTime(workingReport.getLastModifiedTime())
+        .isHoliday(workingReport.isHoliday())
+        .locationCheckin(workingReport.getLocationCheckin())
+        .locationCheckout(workingReport.getLocationCheckout())
+        .build();
+  }
 }

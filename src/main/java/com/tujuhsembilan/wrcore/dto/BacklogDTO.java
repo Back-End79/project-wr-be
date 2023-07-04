@@ -26,7 +26,7 @@ public class BacklogDTO {
   private Long userId;
   private String projectName;
   private String status;
-  private String userName;
+  private String assignedTo;
   private String taskName;
   private String taskDescription;
   private BigDecimal estimationTime;

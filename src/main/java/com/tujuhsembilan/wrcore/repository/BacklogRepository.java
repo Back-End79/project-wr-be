@@ -1,15 +1,14 @@
 package com.tujuhsembilan.wrcore.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.tujuhsembilan.wrcore.model.Backlog;
 import java.util.Optional;
 
-public interface BacklogRepository extends JpaRepository<Backlog, Long> {
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-  Page<Backlog> findByTaskNameContainingIgnoreCase(String taskName, Pageable pageable);
+import com.tujuhsembilan.wrcore.model.Backlog;
+
+public interface BacklogRepository
+    extends PagingAndSortingRepository<Backlog, Long>, JpaSpecificationExecutor<Backlog> {
 
   Optional<Backlog> findByBacklogId(Long backlogId);
 

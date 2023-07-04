@@ -2,11 +2,17 @@ package com.tujuhsembilan.wrcore.service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.criteria.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.tujuhsembilan.wrcore.dto.BacklogDTO;
@@ -34,8 +40,11 @@ public class BacklogService {
     return backlogRepository.findAll(pageable);
   }
 
-  public Page<Backlog> getAllBacklogsWithSearch(Pageable pageable, String search) {
-    return backlogRepository.findByTaskNameContainingIgnoreCase(search, pageable);
+  public Page<Backlog> searchAndSortBacklogs(String search, String sortBy, Sort.Direction sortDirection,
+      Pageable pageable) {
+    Specification<Backlog> specification = searchByKeywordAndSort(search, sortBy, sortDirection);
+    Page<Backlog> backlogPage = backlogRepository.findAll(specification, pageable);
+    return backlogPage;
   }
 
   public Backlog createBacklog(BacklogDTO backlogDTO) {
@@ -68,6 +77,7 @@ public class BacklogService {
   public void deleteBacklog(Long backlogId) throws NotFoundException {
     Backlog existingBacklog = getBacklogById(backlogId);
     backlogRepository.delete(existingBacklog);
+
   }
 
   private CategoryCode getCategoryCodeById(Long categoryId) {
@@ -102,6 +112,7 @@ public class BacklogService {
         .createdOn(new Timestamp(System.currentTimeMillis()))
         .updatedOn(new Timestamp(System.currentTimeMillis()))
         .priority(backlogDTO.getPriority())
+        .taskCode(backlogDTO.getTaskCode())
         .build();
   }
 
@@ -117,14 +128,73 @@ public class BacklogService {
         .taskDescription(backlogDTO.getTaskDescription())
         .estimationTime(backlogDTO.getEstimationTime())
         .actualTime(backlogDTO.getActualTime())
-        .estimationDate(existingBacklog.getEstimationDate())
-        .actualDate(existingBacklog.getActualDate())
-        .createdBy(backlogDTO.getCreatedBy())
+        .estimationDate(backlogDTO.getEstimationDate())
+        .actualDate(backlogDTO.getActualDate())
+        .createdBy(existingBacklog.getCreatedBy())
         .updatedBy(backlogDTO.getUpdatedBy())
         .createdOn(existingBacklog.getCreatedOn())
         .updatedOn(new Timestamp(System.currentTimeMillis()))
         .priority(backlogDTO.getPriority())
+        .taskCode(backlogDTO.getTaskCode())
         .build();
+  }
+
+  // Function below for sorting and searching
+
+  public Specification<Backlog> searchByKeyword(String keyword) {
+    return (root, query, criteriaBuilder) -> {
+      String likeKeyword = "%" + keyword.toLowerCase() + "%";
+
+      Join<Backlog, Project> projectJoin = root.join("projectId");
+      Predicate projectNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(projectJoin.get("picProjectName")),
+          likeKeyword);
+
+      Predicate taskNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("taskName")), likeKeyword);
+      Predicate taskCodePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("taskCode")), likeKeyword);
+
+      Join<Backlog, Users> userJoin = root.join("userId");
+      Predicate userNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(userJoin.get("userName")),
+          likeKeyword);
+
+      return criteriaBuilder.or(projectNamePredicate, taskNamePredicate, taskCodePredicate, userNamePredicate);
+    };
+  }
+
+  public Sort sortBy(String sortBy, Sort.Direction sortDirection) {
+    if (sortBy != null && sortDirection != null) {
+      if (sortDirection.isAscending()) {
+        return Sort.by(sortBy).ascending();
+      } else {
+        return Sort.by(sortBy).descending();
+      }
+    }
+    return Sort.unsorted();
+  }
+
+  public Specification<Backlog> searchByKeywordAndSort(String keyword, String sortBy, Sort.Direction sortDirection) {
+    Specification<Backlog> searchSpecification = searchByKeyword(keyword);
+    Sort sort = sortBy(sortBy, sortDirection);
+
+    return (root, query, criteriaBuilder) -> {
+      Predicate searchPredicate = searchSpecification.toPredicate(root, query, criteriaBuilder);
+      query.where(searchPredicate).orderBy(getOrder(root, query, criteriaBuilder, sort));
+      return query.getRestriction();
+    };
+  }
+
+  private List<Order> getOrder(Root<Backlog> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder, Sort sort) {
+    List<Order> orders = new ArrayList<>();
+    if (sort != null) {
+      for (Sort.Order sortOrder : sort) {
+        String property = sortOrder.getProperty();
+        if (sortOrder.isAscending()) {
+          orders.add(criteriaBuilder.asc(root.get(property)));
+        } else {
+          orders.add(criteriaBuilder.desc(root.get(property)));
+        }
+      }
+    }
+    return orders;
   }
 
 }
