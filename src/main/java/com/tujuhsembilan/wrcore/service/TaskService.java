@@ -10,7 +10,7 @@ import com.tujuhsembilan.wrcore.model.Task;
 import com.tujuhsembilan.wrcore.repository.BacklogRepository;
 import com.tujuhsembilan.wrcore.repository.CategoryCodeRepository;
 import com.tujuhsembilan.wrcore.repository.TaskRepository;
-import com.tujuhsembilan.wrcore.repository.WorkingRepository;
+import com.tujuhsembilan.wrcore.repository.WorkingReportRepository;
 
 import lombok.*;
 
@@ -21,14 +21,14 @@ public class TaskService {
   private final TaskRepository taskRepository;
   private final ModelMapper modelMapper;
   private final BacklogRepository backlogRepository;
-  private final WorkingRepository workingRepository;
+  private final WorkingReportRepository workingReportRepository;
   private final CategoryCodeRepository categoryCodeRepository;
 
   public Task createTask(TaskDTO taskDTO) throws NotFoundException {
     Task task = Task.builder()
         .backlogId(backlogRepository.findById(taskDTO.getBacklogId()).orElseThrow(() -> new NotFoundException()))
         .workingReportId(
-            workingRepository.findById(taskDTO.getWorkingReportId()).orElseThrow(() -> new NotFoundException()))
+            workingReportRepository.findById(taskDTO.getWorkingReportId()).orElseThrow(() -> new NotFoundException()))
         .taskItem(taskDTO.getTaskItem())
         .duration(taskDTO.getDuration())
         .isOvertime(false)
