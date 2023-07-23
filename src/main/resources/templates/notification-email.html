@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="${subject}"></title>
+    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+    <style>
+      /* Global styles for body and other elements */
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+        color: #1b1b1b;
+      }
+
+      .header {
+        background-color: #4285f4;
+        padding: 5px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      .image-wrap {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        padding: 20px;
+      }
+
+      .email-wrapper {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 3px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      .email-heading {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .email-content {
+        font-size: 14px;
+        color: #1d1d1d;
+      }
+
+      .email-content-head {
+        font-size: 18px;
+        color: #131313;
+        margin-bottom: 8px;
+      }
+
+      .email-content-date {
+        margin-top: 10px;
+        font-size: 15px;
+        color: #464646;
+      }
+
+      .email-list {
+        list-style-type: none;
+        padding: 0;
+        margin-top: 15px;
+      }
+
+      .email-list-item {
+        margin-bottom: 5px;
+      }
+
+      .email-list-item b {
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .thank-you {
+        margin-top: 30px;
+        font-size: 15px;
+        color: #2b2b2b;
+      }
+
+      .auto-generated {
+        font-size: 12px;
+        color: #808080;
+        margin-left: 4px;
+        margin-top: 16px;
+      }
+
+      .gray-text {
+        color: #525252;
+      }
+
+      /* Table styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+
+      /* Custom classes for column width */
+      td.name-column {
+        width: 80px;
+        text-align: left;
+      }
+
+      td.value-column {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+        margin-left: 12px;
+      }
+
+      /* Responsive styles */
+      @media only screen and (max-width: 600px) {
+        .email-heading {
+          font-size: 20px;
+        }
+
+        .email-content {
+          font-size: 12px;
+        }
+
+        .email-content-head {
+          font-size: 16px;
+        }
+
+        .email-content-date {
+          font-size: 12px;
+        }
+
+        .email-list-item b {
+          font-size: 12px;
+        }
+
+        .thank-you {
+          font-size: 14px;
+        }
+
+        .auto-generated {
+          font-size: 10px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header"></div>
+    <div class="image-wrap">
+      <img src="https://seeklogo.com/images/P/padepokan-79-logo-5794F3FD14-seeklogo.com.png" height="50" alt="logo" />
+    </div>
+    <div class="email-wrapper">
+      <p class="email-heading">Hi Mr/Mrs Human Capital</p>
+      <span class="email-content-head">For Information overtime time</span><br /><br />
+      <span th:text="${formattedDate}" class="email-content-date"></span>
+      <table class="email-list">
+        <tr>
+          <td class="name-column"><b class="gray-text">Name</b></td>
+          <td>: <span th:text="${fullName}" class="email-content value-column"></span></td>
+        </tr>
+        <tr>
+          <td class="name-column"><b class="gray-text">Project</b></td>
+          <td>: <span th:text="${projectName}" class="email-content value-column"></span></td>
+        </tr>
+        <tr>
+          <td class="name-column"><b class="gray-text">Task</b></td>
+          <td>: <span th:text="${taskDescription}" class="email-content value-column"></span></td>
+        </tr>
+        <tr>
+          <td class="name-column"><b class="gray-text">Total Hour</b></td>
+          <td>: <span th:text="${actualEffort}" class="email-content value-column"></span></td>
+        </tr>
+      </table>
+      <p class="thank-you">Thank you for your attention</p>
+    </div>
+    <p class="auto-generated">This is an auto-generated message, please do not reply</p>
+  </body>
+</html>
+
+<!-- <img src="../img/logo.png" height="50" alt="logo"> -->

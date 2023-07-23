@@ -1,0 +1,4 @@
+include:
+  - project: 'internal-apps/portal-working-report/cicd-config'
+    ref: main
+    file: '/pipeline/ci-maven.yml'
